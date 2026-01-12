@@ -1,0 +1,25 @@
+{
+  "name": "gid",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start-dev": "webpack --config webpack.config.js --watch --mode development",
+    "build-prod": "webpack --config webpack.prod.js --mode production"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.28.5",
+    "@types/socket.io-client": "^3.0.0",
+    "babel-loader": "^10.0.0",
+    "common": "^0.2.5",
+    "css-loader": "^7.1.2",
+    "socket.io-client": "^4.8.3",
+    "ts-loader": "^9.5.4",
+    "typescript": "^5.9.3",
+    "webpack": "^5.104.1",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.2"
+  }
+}

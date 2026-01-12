@@ -1,0 +1,15 @@
+{
+  "compilerOptions": 
+  {
+    "jsx": "preserve",
+    "outDir": "./dist./",
+    "noImplicitAny": true,
+    "module": "es6",
+    "allowJs": false,
+    "moduleResolution": "node",
+    "strictFunctionTypes": false,
+    "target": "ES6",
+    "lib": ["DOM", "ES6"],
+    "allowSyntheticDefaultImports": true
+  }
+}
