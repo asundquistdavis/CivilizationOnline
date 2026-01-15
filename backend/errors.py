@@ -5,3 +5,7 @@ class AuthError(Exception):
 class DisconnectionError(Exception):
 
     pass
+
+class InvalidData(Exception):
+
+    pass

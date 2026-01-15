@@ -1,0 +1,5 @@
+[
+    {"name": "salt", "level": 1, "maxQuantity": 9, "type": "commodity"},
+    {"name": "gold", "level": 2, "maxQuantity": 5, "type": "commodity"},
+    {"name": "cyclone", "level": 3, "maxQuantity": 1, "type": "commodity"}
+]

@@ -1,0 +1,153 @@
+
+:root {
+    --land: #808080;
+    --water: #c6ddec;
+    --coastal: azure;
+    --hovered: black;
+    --border: black;
+    --selected: black;
+    --city: black;
+    --floodplain: darkgreen;
+    --floodplaincity: white;
+    --water-stroke: rgb(85, 178, 255);
+    --effects: #000050;
+    --support0: #CA8C4E;
+    --support1: #B0D050;
+    --support2: #52D552;
+    --support3: #68DABE;
+    --support4: #7DAEE0;
+    pointer-events: none;
+}
+
+svg {
+    pointer-events:visibleFill;
+}
+
+path {
+    pointer-events: none;
+}
+
+
+path[defs] mask path {
+    fill: unset;
+    pointer-events: none;
+}
+
+path[overlay] {
+    pointer-events: none;
+}
+
+path[hovered] {
+    opacity: .5;
+    stroke-linecap:round;
+    pointer-events:none !important;
+    fill: var(--color, --effects);
+}
+
+path[selected] {
+    fill: var(green);
+    opacity: .5;
+    stroke-width: 3px;
+    stroke-linecap: round;   
+    pointer-events: none !important;
+}
+
+path[type='land'] {
+    fill: var(--land)
+}
+
+path[type='cover'] {
+    /* pointer-events: none; */
+    fill: var(--color, var(--land));
+    stroke-opacity: .5;
+}
+
+path[type='water'] {
+    fill: var(--water);
+    stroke-width: .2px;
+    stroke: var(--water-stroke);
+}
+
+path[type='coastal'] {
+    fill: var(--coastal);
+}
+
+text {
+    pointer-events: none;
+    text-anchor: middle;
+    fill: black;
+    font-size: .3rem;
+    font: 'open sans';
+}
+
+circle[support] {
+    user-select: none;
+    pointer-events: none;
+    opacity: 1;
+    fill: yellow;
+    stroke-width: .25px;
+    stroke: black;
+}
+
+circle[value="0"] {fill: var(--support0)}
+circle[value="1"] {fill: var(--support1)}
+circle[value="2"] {fill: var(--support2)}
+circle[value="3"] {fill: var(--support3)}
+circle[value="4"] {fill: var(--support4)}
+text[support] {
+    font-weight: 700;
+    font-size: .45rem
+}
+
+circle[support][exceeding] {
+    stroke: blue;
+    stroke-width: .75px;
+}
+
+path[type="floodplain"] {
+    fill: var(--floodplain);
+    opacity: .5;
+    stroke: none;
+}
+
+path[type="city"] {
+    fill: var(--color, var(--city));
+    stroke: var(--city);
+    stroke-width: .5px;
+}
+
+path[type="city"][floodplaincity] {
+    fill: var(--color, var(--floodplaincity));
+    stroke: var(--floodplaincity);
+}
+
+path[type="volcano"] {
+    fill: red;
+    stroke: black;
+    opacity: 1;
+    stroke-opacity: .5px;
+}
+
+path[overlay] {
+    pointer-events: none;
+    opacity: 1;
+    fill: var(--color, transparent);
+}
+
+path[conflict] {
+    stroke: darkred;
+    stroke-width: 2px;
+}
+
+path[contested] {
+    mask: url(#crossFillMask) !important;
+    fill: var(--color);
+}
+
+g[hide] * {
+    display: none;
+}
+
+path[active] {
+    pointer-events:all;
+}

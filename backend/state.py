@@ -56,7 +56,7 @@ class State:
     
     def getClientById(self, clientId:str):
         
-        return self._clientMap[clientId]
+        return self._clientMap.get(clientId)
 
     def setHost(self, clientId):
 
