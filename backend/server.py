@@ -23,7 +23,7 @@ def loadGame(data):
         raise InvalidData
     with open('./assets/aCardDecks/standard.json', 'r') as aCards,\
         open('./assets/tCardDecks/standard.json', 'r') as tCards,\
-        open('assets/common/civilizations.json', 'r') as civilizations:
+        open('./assets/common/civilizations.json', 'r') as civilizations:
         socket.emit('loadGame', {
             'aCards': aCards.read(),
             'tCards': tCards.read(),

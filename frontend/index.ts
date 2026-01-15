@@ -3,14 +3,16 @@ import Conn from "./conn";
 import DB from "./db";
 import Game from "./game";
 import GUI from "./gui";
+import { LoadingState, State, StateMap, StateName } from "./state";
 import './styles/root.css';
 
-class Client {
+export class Client {
 
-    private _conn:Conn;
-    private _db:DB;
-    private _gui:GUI;
-    private _state: StateType='loading';
+    conn:Conn;
+    db:DB;
+    gui:GUI;
+    stateName:StateName='loading';
+    state:State = new LoadingState();
 
     static async start() {
 
@@ -18,12 +20,12 @@ class Client {
 
         const [conn, db] =await Promise.all([Conn.startAndGet(), DB.startAndGet()])
 
-        client._conn = conn;
-        client._db = db;
-        client._gui = GUI.createAndGet();
+        client.conn = conn;
+        client.db = db;
+        client.gui = GUI.createAndGet();
 
         // put a placeholder map up;
-        client._gui.board.loadMap(conn);
+        client.gui.board.loadMap(conn);
 
         client.resolveState();
 
@@ -45,70 +47,22 @@ class Client {
 
     resolveState() {
 
-        if (!this.username) {
-
-            return this.setState('choosing-username');
-
-        }
-
-        if (!this.gameId) {
-
-            return this.setState('choosing-game');
-
-        }
+        const targetStateName:StateName = (Object.values(StateMap).find((State)=>State.condition(this))?.nameProp||'loading');
+        this.setState(targetStateName);
 
     }
 
-    setState(targetState:StateType) {
-
-        return new Promise(async (resolve, reject)=>{
-
-            this._gui.reset();
-            
-            switch (targetState) {
-
-                case 'choosing-username':
-                                    
-                    const submitNewUsername = (username:string) => {
-                    
-                        this.username = username
-                        
-                        this.resolveState();
-                        
-                    }
-                
-                    this._gui.createUsernameWindow(submitNewUsername);
-
-                    
-                    break;
-
-                case 'choosing-game':
-
-                    const game = await Game.createAndGet(this._db, this._conn, this.username, [this.username]);
-
-                    const allTCards = await this._db.getAllEntitiesWithOSIndexValue('tCard', 'gameId', game.id);
-                    
-                    console.log(allTCards);
-
-                default:
-                        
-                    break;
-                        
-            }
-                    
-            resolve(targetState);
-
-        })
+    setState(targetStateName:StateName) {
     
+        this.state.onRemove(this);
+        this.state = new StateMap[targetStateName];
+        this.state.onSet(this);
+
     }
 
 }
 
-type StateType = 
-    'loading'|
-    'choosing-username'|
-    'choosing-game'|
-    'playing'
+
 
 // async function start() {
 //     }

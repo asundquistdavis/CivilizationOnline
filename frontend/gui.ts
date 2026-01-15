@@ -1,10 +1,12 @@
 
 import Board from './board';
+import { ChoosingUsernameComponentInstance } from './guiComponents/choosingUsername';
 import './styles/gui.css';
 
 export default class GUI {
 
     board: Board;
+    components:InstanceType<GUIComponentConstructor>[]=[];
 
     static createAndGet() {
 
@@ -28,92 +30,76 @@ export default class GUI {
 
     }
 
+    registerComponent<T extends GUIComponentConstructor>(Component:T, props: T['props']) {
 
-    createUsernameWindow(submit:(username:string)=>void, parentId='gui') {
-
-        const windowId = 'username-window';
-        const window = document.createElement('div');
-        const header = document.createElement('div');
-        const body = document.createElement('div');
-        const bodyLeft = document.createElement('div');
-        const bodyRight = document.createElement('div');
-        const usernameInput = document.createElement('input');
-        const submitButton = document.createElement('button');
+        this.components.push( Component.register(props))
         
-        const onChange = (event:InputEvent) => {
-        }
-
-        const onKeyDown = (event:KeyboardEvent) => {
-            if (event.key === 'Enter') {
-                submit(usernameInput.value);
-            }
-        }
-
-        const onClick = () => {
-            submit(usernameInput.value);
-        }
-
-        window.id = windowId;
-        window.className = 'window';
-        header.id = windowId + '-header';
-        header.innerText = 'Enter Username';
-        body.id = windowId + '-body';
-        bodyLeft.id = windowId + '-body-left';
-        bodyRight.id = windowId + '-body-right';
-        usernameInput.id = windowId + '-username-input';
-        usernameInput.addEventListener('change', onChange);
-        usernameInput.addEventListener('keydown', onKeyDown);
-        usernameInput.setAttribute('placeholder', 'username');
-        submitButton.id = windowId + '-submit-button';
-        submitButton.innerText = 'log in';
-        submitButton.addEventListener('onclick', onClick);
-
-        window.appendChild(header);
-        window.appendChild(body);
-        body.appendChild(bodyLeft);
-        body.appendChild(bodyRight);
-        bodyLeft.appendChild(usernameInput);
-        bodyRight.appendChild(submitButton);
-
-        document.getElementById(parentId).appendChild(window);
-
     }
 
+    unRegisterComponent(componentName:GUIComponentName) {
 
-    createSettingsWindowWith(buttonPropsList:SettingsWindowButtonProps[], parentId='at-settings') {
+        const [keep, remove]:InstanceType<GUIComponentConstructor>[][] =this.components.reduce(([keep, remove], current) => {
+            if (current.name!==componentName) {keep.push(current)}
+            else {remove.push(current)}
+            return [keep, remove]
+        }, [[], []])
 
-        const window = document.createElement('div');
-        
-        const getSettingsWindowButton = (buttonProps:SettingsWindowButtonProps) => {
+        this.components = keep;
 
-            const buttonWrapper = document.createElement('div');
-            const button = document.createElement('button');
-
-            button.innerText = buttonProps.text
-            button.addEventListener('click', buttonProps.onClick)
-
-            buttonWrapper.appendChild(button);
-            return buttonWrapper
-
-        }
-
-        buttonPropsList.forEach(buttonProps=>window.appendChild(getSettingsWindowButton(buttonProps)));
+        remove.forEach(component=>component.unRegister());
 
     }
 }
 
-type SettingsWindowButtonProps = {
-    text:string,
-    onClick:(event:MouseEvent)=>void,
+export interface GUIComponent {
+
+    name:GUIComponentName;
+    create:CreateGUIComponent
+    unRegister():void;
+
 }
 
+export interface GUIComponentConstructor {
 
-    // if (!username) {
-    //     const submit = (username:string) => {
-    //         localStorage.setItem('username', username);
-    //         conn.emit('username', {})
+    props:{[prop:string]:any};
+    register(props:GUIComponentProps):GUIComponent;
+    new():GUIComponent
+
+}
+
+export const createGUIComponentType = <T extends GUIComponentConstructor>(constructor:T)=>{return constructor}
+export const ChoosingUsernameComponent = createGUIComponentType(ChoosingUsernameComponentInstance);
+
+export type GUIComponentProps = {
+    [prop:string]:any
+}
+
+export type GUIComponentName = 'choosing-new-username';
+
+    // createSettingsWindowWith(buttonPropsList:SettingsWindowButtonProps[], parentId='at-settings') {
+
+    //     const window = document.createElement('div');
+        
+    //     const getSettingsWindowButton = (buttonProps:SettingsWindowButtonProps) => {
+
+    //         const buttonWrapper = document.createElement('div');
+    //         const button = document.createElement('button');
+
+    //         button.innerText = buttonProps.text
+    //         button.addEventListener('click', buttonProps.onClick)
+
+    //         buttonWrapper.appendChild(button);
+    //         return buttonWrapper
 
     //     }
-    //     createUsernameSection(submit);
 
+    //     buttonPropsList.forEach(buttonProps=>window.appendChild(getSettingsWindowButton(buttonProps)));
 
+    // }
+
+type CreateGUIComponent = (props:{[prop:string]: any})=>void;
+
+// type SettingsWindowButtonProps = {
+//     text:string,
+//     onClick:(event:MouseEvent)=>void,
+// }
