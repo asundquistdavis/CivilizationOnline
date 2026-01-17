@@ -1,0 +1,17 @@
+
+
+div#loading-window {
+
+
+    border: solid black 1px;
+    border-radius: 5px;
+    position: relative;
+    top: 30%;
+    left:50%;
+    translate: -50% -50%;
+    width: fit-content;
+    padding: 5px;
+    background-color: aliceblue;
+
+}
+

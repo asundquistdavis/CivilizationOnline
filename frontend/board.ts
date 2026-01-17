@@ -21,6 +21,7 @@ export class Map {
     private _height:number;
     private _isMoving: boolean;
     private _SVG:Element;
+    private _movementSpeed: number = 3;
     boardWidth:number;
     boardHeight:number;
 
@@ -71,8 +72,8 @@ export class Map {
 
         const onMouseMove = (event:MouseEvent) => {
             if (this._isMoving) {
-                this._x += event.movementX;
-                this._y += event.movementY;
+                this._x += event.movementX / this._movementSpeed / this._scaleFactor;
+                this._y += event.movementY / this._movementSpeed / this._scaleFactor;
                 this.bound();
                 this.render();
             }

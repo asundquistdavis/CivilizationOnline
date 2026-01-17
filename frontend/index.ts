@@ -2,7 +2,7 @@ import Board from "./board";
 import Conn from "./conn";
 import DB from "./db";
 import Game from "./game";
-import GUI from "./gui";
+import GUI from "./guiComponentLibrary/gui";
 import { LoadingState, State, StateMap, StateName } from "./state";
 import './styles/root.css';
 
@@ -48,6 +48,7 @@ export class Client {
     resolveState() {
 
         const targetStateName:StateName = (Object.values(StateMap).find((State)=>State.condition(this))?.nameProp||'loading');
+        console.log(targetStateName);
         this.setState(targetStateName);
 
     }

@@ -1,13 +1,11 @@
 import { Client } from ".";
-import { ChoosingGameInstance } from "./states/choosingGame";
-import { ChoosingUsernameInstance } from "./states/choosingUsername";
 import { LoadingInstance } from "./states/loading";
 import { PlayingInstance } from "./states/playing";
+import { PregameInstance } from "./states/pregame";
 
 export type StateName =
     'loading'|
-    'choosing-username'|
-    'choosing-game'|
+    'pregame'|
     'playing';
 
 export interface State {
@@ -24,12 +22,12 @@ interface StateConstructor {
 
 export const createStateType = <T extends StateConstructor>(constructor:T)=>{return constructor}
 export const LoadingState = createStateType(LoadingInstance);
+export const PregameState = createStateType(PregameInstance);
 export const PlayingState = createStateType(PlayingInstance);
-export const ChoosingGameState = createStateType(ChoosingGameInstance);
-export const ChoosingUsernameState = createStateType(ChoosingUsernameInstance);
 
 export const StateMap = {
     'loading':LoadingState,
-    'choosing-username':ChoosingUsernameState,
-    'choosing-game':ChoosingGameState,
+    'pregame':PregameState,
     'playing':PlayingState}
+
+
