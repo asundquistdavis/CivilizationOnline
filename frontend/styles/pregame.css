@@ -1,10 +1,17 @@
 
-div#pregame-window-wrapper {
+div#pregame-window-holder {
 
     position: relative;
     left:50%;
     top:30%;
-    translate: -50% -50%;
+    translate: -50% 0;
+
+}
+
+div#pregame-window-holder td.civilization-name {
+
+    --civilization-color: currentColor;
+    background-color: var(--civilization-color);
 
 }
 

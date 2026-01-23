@@ -1,8 +1,8 @@
 import { Client } from "..";
-import { createStateType, State, StateName } from "../state";
+import { Window, WindowName } from "../window";
 
-export class PlayingInstance implements State {
-    static nameProp:StateName = 'playing';
+export class PlayingInstance implements Window {
+    static nameProp:WindowName = 'playing';
     onSet(client: Client): void {
         throw new Error("Method not implemented.");
     }

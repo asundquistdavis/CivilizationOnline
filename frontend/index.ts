@@ -1,33 +1,25 @@
-import Board from "./board";
-import Conn from "./conn";
-import DB from "./db";
-import Game from "./game";
-import GUI from "./guiComponentLibrary/gui";
-import { LoadingState, State, StateMap, StateName } from "./state";
+import Data from "./data";
+import GUI from "./gui";
 import './styles/root.css';
+import { LoadingWindow, Window, WindowMap, WindowName } from "./window";
 
 export class Client {
 
-    conn:Conn;
-    db:DB;
     gui:GUI;
-    stateName:StateName='loading';
-    state:State = new LoadingState();
+    windowName:WindowName='loading';
+    window:Window = new LoadingWindow();
+    data:Data;
 
     static async start() {
 
         const client = new Client();
-
-        const [conn, db] =await Promise.all([Conn.startAndGet(), DB.startAndGet()])
-
-        client.conn = conn;
-        client.db = db;
+        client.data = await Data.startAndGet(client.resolveWindow.bind(client));
         client.gui = GUI.createAndGet();
 
         // put a placeholder map up;
-        client.gui.board.loadMap(conn);
+        client.data.loadMap();
 
-        client.resolveState();
+        client.resolveWindow();
 
     }
 
@@ -45,24 +37,24 @@ export class Client {
 
     get gameId() {return false}
 
-    resolveState() {
+    resolveWindow() {
 
-        const targetStateName:StateName = (Object.values(StateMap).find((State)=>State.condition(this))?.nameProp||'loading');
-        console.log(targetStateName);
-        this.setState(targetStateName);
+        const targetWindowName:WindowName = (Object.values(WindowMap).find((window)=>window.condition(this))?.nameProp||'loading');
+        this.setWindow(targetWindowName);
 
     }
 
-    setState(targetStateName:StateName) {
+    setWindow(targetStateName:WindowName) {
     
-        this.state.onRemove(this);
-        this.state = new StateMap[targetStateName];
-        this.state.onSet(this);
+        this.window.onRemove(this);
+        this.windowName = targetStateName;
+        this.window = new WindowMap[targetStateName];
+        this.window.onSet(this);
 
     }
 
 }
-
+ 
 
 
 // async function start() {

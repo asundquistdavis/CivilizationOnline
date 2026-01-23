@@ -1,16 +1,19 @@
 import {io, Socket} from 'socket.io-client';
+import Data from './data';
 
-type ServerData = {[prop:string]: string|ArrayBuffer|ArrayLike<number>|number}
+type ServerData = any
+type ServerPayload = string;
 
-type ClientData = {[prop:string]: string}
+type ClientData = any
 
 export default class Conn {
 
     private _socket:Socket;
     private _isConnected:boolean;
 
-    on(event:string, callback:(data:ServerData)=>void) {
+    on(event:string, callback:(data:ServerData|ServerPayload)=>void, once:boolean=false):void {
 
+        if (once) {this._socket.once(event, callback)}
         this._socket.on(event, callback);
     
     }
@@ -21,13 +24,18 @@ export default class Conn {
 
     }
 
-    static startAndGet() {
+    static startAndGet(data:Data) {
 
         return new Promise<Conn>((resolve, reject)=>{
 
             const conn = new Conn();
             
-            conn._socket = io({auth: {username: localStorage.getItem('username')}});
+            conn._socket = io({auth: {userId: localStorage.getItem('userId')}});
+
+            conn.on('auth', (userId:string)=>{
+                data.userId = userId
+                localStorage.setItem('userId', userId);
+            });
 
             conn.on('error', (error:ServerData) => {
 

@@ -1,0 +1,18 @@
+
+select.form-select {
+    --color: var(--window-block-color-1);
+    background-color: var(--color);
+}
+
+select.form-select:focus {
+    outline: none; /* Removes the default browser outline */
+    /* Add your custom, accessible focus styles here: */
+    /* border: none; Example custom border */
+}
+
+
+option.form-option {
+    --color: var(--window-block-color-1);
+    background-color: var(--color);
+}
+

@@ -1,13 +1,4 @@
 
-:root {
-
-    --window-padding: 3px;
-    --window-line-color-1: #0b132b;
-    --window-line-color-2: #ffffff;
-    --window-block-color-1: #5bc0be;
-    --window-block-color-2: #3a506b;
-
-}
 
 div#gui {
 
@@ -51,106 +42,8 @@ button.button {
 
 }
 
-div.window-wrapper {
 
-
-
-}
-
-div.window {
-
-    overflow: hidden;
-    border: solid 1px;
-    border-radius: 5px;
-    pointer-events: all;
-    min-width: 100px;
-    min-height: 50px;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-start;
-}
-
-div.window:has(div.window-title, div.window-title-buttons) div.window-header button.window-header-tab{
-
-    padding-top: calc( 2 * var(--window-padding) );
-
-}
-
-div.window-title {
-
-    position: absolute;
-    top: 0;
-    translate: 0 -65%;
-    left: var(--window-padding);
-    padding: 1px;
-    border-radius: 3px;
-
-
-}
-
-div.window-title-buttons {
-
-    position: absolute;
-    top:0;
-    right:0;
-    translate: 0 -65%;
+div.row {
     display: flex;
     flex-direction: row;
-    justify-content: end;
-
 }
-
-button.window-title-button {
-
-    line-height: 0;
-    aspect-ratio: 1/1;
-    border-radius: 50%;
-    padding:2px;
-    color: var(--window-block-color-1);
-    background-color: var(--window-line-color-1);
-    margin-left: var(--window-padding);
-    pointer-events: all;
-
-}
-
-div.window-header {
-
-    border-radius: inherit;
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-    align-items: center;
-    margin-right: var(--window-padding);
-
-}
-
-button.window-header-tab {
-
-    padding: var(--window-padding);
-    border-bottom: solid 1px;
-    border-right: solid 1px;
-
-}
-
-button.window-header-tab[active] {
-
-    background-color: var(--window-block-color-2);
-    color: var(--window-block-color-1);
-    border-color: var(--window-line-color-1);
-
-}
-
-div.window-body {
-
-    padding: var(--window-padding)
-
-}
-
-div.window-footer {
-
-    padding: var(--window-padding);
-    padding-top: 0;
-
-}
-

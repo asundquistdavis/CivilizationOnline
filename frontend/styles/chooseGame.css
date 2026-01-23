@@ -1,0 +1,9 @@
+
+div#choose-game-window-holder {
+
+    position: relative;
+    left:50%;
+    top:30%;
+    translate: -50% 0;
+
+}

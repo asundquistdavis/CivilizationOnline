@@ -1,11 +1,10 @@
 import { Client } from "..";
 import LoadingComponent from "../Components/loading";
-import { createStateType, State, StateName } from "../state";
+import { Window, WindowName } from "../window";
 
-export class LoadingInstance implements State {
-    static nameProp:StateName = 'loading';
+export class LoadingInstance implements Window {
+    static nameProp:WindowName = 'loading';
     onSet(client: Client): void {
-        console.log(client.gui);
         const loading = client.gui.registerComponent(LoadingComponent, {
             parentId: 'gui',
         })
