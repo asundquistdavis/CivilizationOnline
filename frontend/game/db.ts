@@ -1,4 +1,3 @@
-import { GameSettings } from "./data";
 
 export type DBEntityType = 'players'|'units'|'ships'|'cities'|'tCards'|'aCards';
 
@@ -9,7 +8,7 @@ export type UserAsDBSafe = {
 export type GameAsDBSafe = {
     id:number,
     hostUsername:string,
-} & GameSettings
+}
 
 export type UnitAsDBSafe = {
     id:number,

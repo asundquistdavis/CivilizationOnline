@@ -1,5 +1,5 @@
 import './styles/gui.css';
-import GUIComponentBase from './guiComponentLibrary/base';
+import GUIComponentBase from '../components/base';
 
 type GUIProps = {
     parentId:string
