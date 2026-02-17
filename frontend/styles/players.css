@@ -1,0 +1,13 @@
+
+
+div#players-window-wrapper {
+
+    --bottom:var(--second-bottom);
+    bottom:var(--bottom);
+    --left:var(--gutter);
+    min-width: 100px;
+    left:var(--left);
+    position: absolute;
+
+}
+

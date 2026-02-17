@@ -1,0 +1,74 @@
+
+div.tool-bar-window {
+
+    position: absolute;
+    max-height: var(--first-height);
+    top: var(--first-top);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding-top: 0;
+    padding: var(--window-padding);
+
+}
+
+div.tool-bar-window {
+
+    overflow: visible;
+
+}
+
+div.tool-bar-window.right {
+
+    right: var(--gutter);
+
+}
+
+div.tool-bar-window.left {
+
+    left: var(--gutter);
+
+}
+
+div.tool-bar-window div.window-tab {
+
+    position: relative;
+
+}
+
+div.tool-bar-window div:not(:first-child) {
+    margin-left: var(--window-padding);
+}
+
+div.tool-bar-window div.window-tab div.window-post-tab {
+
+    position: absolute;
+    border: solid 1px;
+    display: flex;
+    flex-direction: column;
+    text-wrap: nowrap;
+
+}
+
+div.tool-bar-window div.window-tab div.window-post-tab div {
+    margin: 0;
+}
+
+div.icon {
+
+    width:10px;
+    height:10px;
+
+}
+ 
+div#gui {
+
+    --gutter: calc( 3 * var(--window-padding) );
+    --first-height: calc( 20 * var(--window-padding) );
+    --first-top: var(--gutter);
+    --first-bottom: calc( 100dvh - var(--first-top) - var(--first-height) ); 
+    --second-top: calc( var(--first-height) + 3 * var(--gutter) );
+    --second-bottom: var(--gutter);
+    --second-height: calc( 100dvh - var(--second-height) - var(--second-bottom) );
+
+}

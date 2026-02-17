@@ -1,29 +1,59 @@
 :root {
 
     --window-padding: 3px;
-    --window-line-color-1: #0b132b;
-    --window-line-color-2: #ffffff;
-    --window-block-color-1: #5bc0be;
-    --window-block-color-2: #3a506b;
+    --window-line-color-1: #aa947b;
+    --window-line-color-2: #3d352a;
+    --window-block-color-1: #eae0d5;
+    --window-block-color-2: #5e503f;
+
+}
+
+div#gui div.window-wrapper.centered-top {
+
+    --spacer: calc( 3 * var(--window-padding) );
+    --top: var(--second-top);
+    --left: var(--gutter);
+    --right: var(--gutter);
+    --bottom: var(--second-bottom);
+    position: absolute;
+    left: calc( (100dvw - var(--right) + var(--left) ) / 2 );
+    top: var(--top);
+    translate: -50% 0;
+    pointer-events: none;
+    z-index: 3;
+
+}
+
+div#gui div.window-wrapper.centered-bottom {
+
+    --spacer: calc( 3 * var(--window-padding) );
+    --bottom: var(--second-bottom);
+    position: absolute;
+    bottom:var(--bottom);
+    left: 50%;
+    translate: -50% 0;
+    pointer-events: all;
+    width: fit-content;
 
 }
 
 div.window {
 
+    height: calc(100dvh - var(--top) - var(--bottom) );
+    width: calc( 100dvw - var(--left) - var(--right) );
+    max-width: var(--max-width);
+    max-height: var(--max-height);
+    position: static;
     overflow: hidden;
     border: solid 1px;
     border-radius: 5px;
     pointer-events: all;
-    min-width: 300px;
-    width:fit-content;
-    min-height: 50px;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
-    background-color: var(--window-block-color-1);
-    border-color: var(--window-line-color-1);
-    color: var(--window-block-color-1);
+    padding-top: calc( 3 * var(--window-padding));
+    overflow-y: auto;
 
 }
 
@@ -37,8 +67,9 @@ div.window-title {
 
     position: absolute;
     top: 0;
-    translate: 0 -65%;
+    translate: 0 calc( 3 * var(--window-padding) - 100%);
     left: var(--window-padding);
+    right: var(--window-padding);
     padding: 1px;
     border-radius: 3px;
 
@@ -49,7 +80,7 @@ div.window-title-badges-wrapper {
 
     position: absolute;
     top:0;
-    right:0;
+    right:var(--window-padding);
     translate: 0 -65%;
     display: flex;
     flex-direction: row;
@@ -86,7 +117,7 @@ div.window-header {
 
 }
 
-button.window-tab {
+button.window-header-tab {
 
     padding: var(--window-padding);
     border-bottom: solid 1px;
@@ -94,7 +125,7 @@ button.window-tab {
 
 }
 
-button.window-tab[active] {
+button.window-header-tab[active] {
 
     background-color: var(--window-block-color-2);
     color: var(--window-block-color-1);
@@ -115,3 +146,9 @@ div.window-footer {
 
 }
 
+div.window-title-badges input.text-input {
+
+    user-select: text;
+    position: all;
+
+}

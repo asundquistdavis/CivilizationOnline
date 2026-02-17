@@ -1,5 +1,4 @@
 import {io, Socket} from 'socket.io-client';
-import Data from '../data';
 
 type ServerData = any
 type ServerPayload = string;
@@ -20,7 +19,7 @@ export default class Conn {
 
     emit(event:string, data:ClientData) {
 
-        this._socket.emit(event, { username: localStorage.getItem('username'), ...data});
+        this._socket.emit(event, data);
 
     }
 

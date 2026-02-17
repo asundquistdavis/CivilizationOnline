@@ -1,0 +1,14 @@
+
+div#census-window-wrapper {
+
+    
+    position: absolute;
+    left: 50%;
+    top:30%;
+    translate: -50% 0;
+    --max-width: 430px;
+    --max-height: 465px;
+
+
+}
+

@@ -11,15 +11,9 @@ export class Client {
     static async start() {
 
         const client = new Client();
-        client.game = await Game.startAndGet();
         client.gui = GUI.createAndGet();
-
-        // put a placeholder map up;
-        client.resolveState();
+        client.game = await Game.startAndGet(client.gui);
 
     }
 
-    resolveState() {}
-
 }
- 

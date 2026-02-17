@@ -1,0 +1,11 @@
+
+div#selected-window-wrapper {
+
+    --bottom:var(--second-bottom);
+    bottom:var(--bottom);
+    --right:var(--gutter);
+    right:var(--right);
+    position: absolute;
+    min-width: 200px;
+
+}

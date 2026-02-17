@@ -1,0 +1,15 @@
+
+
+div#phase-phase {
+
+    position: absolute;
+    left: 50%;
+    top:var(--first-top);
+    translate: -50% 0;
+    padding: 5px;
+    pointer-events: all;
+    background-color: blue;
+    border-radius: 5px;
+
+}
+

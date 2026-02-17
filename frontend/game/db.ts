@@ -1,5 +1,6 @@
+import { GameState, GameSetting, Plural, Plurals, ActiveGame } from "./game";
 
-export type DBEntityType = 'players'|'units'|'ships'|'cities'|'tCards'|'aCards';
+export type DBEntityType = 'games'|'players'|'units'|'ships'|'cities'|'tCards'|'aCards';
 
 export type UserAsDBSafe = {
     username:string,
@@ -7,7 +8,7 @@ export type UserAsDBSafe = {
 
 export type GameAsDBSafe = {
     id:number,
-    hostUsername:string,
+    hostId:string,
 }
 
 export type UnitAsDBSafe = {
@@ -36,6 +37,7 @@ export type aCardAsDBSafe = {
 }
 
 export type DBEntityMap = {
+    games: GameAsDBSafe,
     players: any,
     units: UnitAsDBSafe,
     ships: ShipAsDBSafe,
@@ -54,99 +56,131 @@ export default class DB {
 
     private _db:IDBDatabase;
 
-    addEntityAndGetId(dbEntity:DBEntityType, value:Partial<DBEntityMap[typeof dbEntity]>):Promise<string> {
-
-        return new Promise<DBEntityMap[typeof dbEntity]>((resolve, reject)=>{
-
-            const request = this._db.transaction(dbEntity, 'readwrite').objectStore(dbEntity).add(value);
-
-            request.onsuccess = (event) => {
-
-                const instanceId = (event.target as IDBRequest).result;
-
-                resolve(instanceId);
-
-            }
-
-            request.onerror = (event) => {
-
-                const error = (event.target as IDBRequest).error;
-
-                reject(error);
-
-            }
-        
-        })
-
-    }
-
-    addGameAndGetId(control:DBControl, name:string):Promise<string> {
+    hostNewGame() {
 
         return new Promise<string>((resolve, reject)=>{
 
-            const request = this._db.transaction('games', 'readwrite').objectStore('games').add({hostId:control.hostId, name: name});
-    
-            request.onsuccess = (event) => {
-    
-                const result = (event.target as IDBRequest).result;
-    
-                resolve(result);
-    
-            }
+            const transaction = this._db.transaction(['game', 'setting', 'state'],'readwrite');
 
-            request.onerror = (event) => {
+            const request = transaction.objectStore('game').add({});
 
-                const error = (event.target as IDBRequest).error;
+            request.onsuccess = event => {
+                
+                const gameId = (event.target as IDBRequest).result;
 
-                reject(error);
+                transaction.objectStore('setting').add({gameId});
 
-            }
+                transaction.objectStore('state').add({gameId});
+
+                resolve(( event.target as IDBRequest).result)
+
+            };
+
+            request.onerror = event => reject((event.target as IDBRequest).error);
+
+        });
+
+    }
+
+    getPluralsAll(dbEntityKey:keyof Plurals, gameId:string):Promise<Plurals[typeof dbEntityKey]> {
+
+        return new Promise((resolve, reject)=>{
+
+            const keyRange = IDBKeyRange.only(gameId);
+
+            const request = this._db.transaction(dbEntityKey, 'readonly').objectStore(dbEntityKey).index('gameId').getAll(gameId);
+
+            request.onsuccess = event => resolve((event.target as IDBRequest).result);
+
+            request.onerror = event => reject((event.target as IDBRequest).error);
 
         })
 
     }
 
-    putEntity<K extends keyof DBEntityMap>(dbEntity:K, instance:Partial<DBEntityMap[K][number]>) {
+    getPluralInstance(dbEntity:keyof Plural, id:string):Promise<Plural[typeof dbEntity]> {
 
-        const request = this._db.transaction(dbEntity, 'readwrite').objectStore(dbEntity).put(instance)
+        return new Promise((resolve, reject)=>{
 
-        request.onsuccess = (event) => {
+            const keyRange = IDBKeyRange.only(id);
 
-            const result = (event.target as IDBRequest).result
+            const transaction = this._db.transaction(dbEntity, 'readonly').objectStore(dbEntity).get(keyRange);
 
-            console.log(result);
-        
-        };
+            transaction.onsuccess = event => resolve((event.target as IDBRequest).result);
+
+            transaction.onerror = event => reject((event.target as IDBRequest).error);
+
+        })
 
     }
 
-    getEntityByKey(dbEntity:DBEntityType, key:number|string):Promise<DBEntityMap[DBEntityType]> {
+    putPluralInstance(dbEntity:keyof Plurals, value:Partial<Plural[typeof dbEntity]>, gameId:string):Promise<string> {
 
-        return new Promise<DBEntityMap[DBEntityType]>((resolve, reject) => {
+        return new Promise((resolve, reject)=>{
 
-            const transaction = this._db.transaction(dbEntity, 'readonly').objectStore(dbEntity).get(key)
-        
-            transaction.onsuccess = (event) => {
-                
-                const result = (event.target as IDBRequest).result as DBEntityMap[DBEntityType]; 
+            const request = this._db.transaction(dbEntity, 'readwrite').objectStore(dbEntity).put({...value, gameId});
 
-                resolve(result);
-            
-            }
+            request.onsuccess = event => resolve((event.target as IDBRequest).result);
 
-            transaction.onerror = (event) => {
+            request.onerror = event => reject((event.target as IDBRequest).error);
 
-                const error = (event.target as IDBRequest).error;
+        });
 
-                reject(error)
-
-            }
-
-        }) 
-    
     }
 
-    async getAllEntitiesWithOSIndexValue(os: DBEntityType, index:string, value: string|number) {
+    putPluralsAll(dbEntity:keyof Plurals, values:Plurals[typeof dbEntity], gameId:string) {
+
+        return new Promise((resolve, reject)=>{
+
+            const objectStore = this._db.transaction(dbEntity, 'readwrite').objectStore(dbEntity);
+
+            values.forEach(value=>{
+
+                objectStore.put({...value, gameId});
+
+            });
+
+            objectStore.transaction.oncomplete = event => resolve((event.target as IDBRequest).result);
+
+            objectStore.transaction.onerror = event => reject((event.target as IDBRequest).error);
+
+        });
+
+    }
+
+    getSingle(key:'setting'|'state', gameId:string):Promise<GameSetting|GameState> {
+
+        return new Promise((resolve, reject)=>{
+
+            const request = this._db.transaction(key, 'readonly').objectStore(key).get(gameId);
+
+            request.onsuccess = event => resolve((event.target as IDBRequest).result);
+
+            request.onerror = event => reject((event.target as IDBRequest).error);
+
+        })
+
+    }
+
+    putSingle(key:'setting'|'state', value:Partial<GameState>|Partial<GameSetting>, gameId:string) {
+
+        console.log(key, value, gameId);
+
+        return new Promise((resolve, reject)=>{
+
+            const request = this._db.transaction(key, 'readwrite').objectStore(key).put({...value, gameId});
+
+            request.onsuccess = event => resolve((event.target as IDBRequest).result);
+
+            request.onerror = event => reject((event.target as IDBRequest).error);
+
+        });
+
+    }
+
+
+
+    async getAllEntitiesWithOSIndexValue(os: DBEntityType, index:string, value: string|number):Promise<any[]> {
 
         return new Promise((resolve, reject) => {
 
@@ -184,8 +218,14 @@ export default class DB {
 
                 const db = (event.target as IDBOpenDBRequest).result;
 
-                // game = {id, hostUserName, isActive}
-                const gamesOS = db.createObjectStore('games', {keyPath: 'id', autoIncrement: true});
+                // game = {id}
+                const gameOS = db.createObjectStore('game', {keyPath: 'id', autoIncrement: true});
+
+                // setting = {*gameId, }
+                const settingOS = db.createObjectStore('setting', {keyPath:'gameId'});
+
+                //state = {*gameId, }
+                const stateOS = db.createObjectStore('state', {keyPath: 'gameId'});
 
                 // player = {id, gameId, username, isActive}
                 const playersOS = db.createObjectStore('players', {keyPath: 'id', autoIncrement: true});
@@ -206,6 +246,7 @@ export default class DB {
                 const tCardOS = db.createObjectStore('tCards', {keyPath: 'id', autoIncrement: true});
 
                 playersOS.createIndex('gameIdAndUserId', ['gameId', 'userId'], {unique: true});
+                playersOS.createIndex('gameId', 'gameId', {unique:false});
                 unitsOS.createIndex('gameIdAndUserId', ['gameId', 'userId'], {unique: false});
                 shipsOS.createIndex('gameIdAndUserId', ['gameId', 'userId'], {unique: false});
                 citiesOS.createIndex('gameIdAndUserId', ['gameId', 'userId'], {unique: false});

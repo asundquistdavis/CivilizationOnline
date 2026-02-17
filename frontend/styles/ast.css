@@ -1,0 +1,92 @@
+
+div#ast-window-wrapper {
+
+    position: absolute;
+    --max-width: 430px;
+    --max-height: 465px;
+    --ast-track-color-1: #c5a691;
+    --ast-track-color-2: #d4c2b2;
+    --victory-points: rgb(153, 136, 41);
+    --ast-turn-cell: rgb(187, 187, 187);
+    --ast-turn-title: rgb(129, 129, 129);
+
+}
+
+div#ast-window-wrapper td {
+
+    border: 1px solid black;
+    border-collapse: collapse;
+    width: var(--cell-width);
+    
+}
+
+div#ast-window-wrapper tr {
+    
+    display: block;
+    
+}
+
+div#ast-window-wrapper table {
+    
+    width: calc(100%);
+    table-layout: fixed;
+    --cell-width: calc( ( var(--max-width) - 100px ) / 16);
+
+}
+
+
+div#ast-window-wrapper td[age-color="dark"] {
+    background-color: var(--ast-track-color-1);
+}
+
+div#ast-window-wrapper td[age-color="light"] {
+    background-color: var(--ast-track-color-2);
+}
+
+div#ast-window-wrapper td {
+
+    height: 21px;
+    background-color: var(--color, unset);
+
+}
+
+
+div#ast-window-wrapper td.ast-name-cell {
+
+    width:75px;
+    color: black;
+    padding: 2px;
+    text-align: center;
+
+}
+
+div#ast-window-wrapper tr.ast-score-row td {
+    border: none;
+    height: 21px;
+    padding: 1px;
+    text-align: center;
+    vertical-align: middle;
+    font-size: small;
+    color: var(--victory-points);
+}
+
+div#ast-window-wrapper tr.ast-score-row td.ast-score-row-title {
+
+    width: 75px;
+
+}
+
+div#ast-window-wrapper tr.ast-turn-row td {
+
+    height: 21px;
+    text-align: center;
+    vertical-align: middle;
+    font-size: small;
+    background-color: var(--ast-turn-cell);
+
+}
+
+div#ast-window-wrapper tr.ast-turn-row td.ast-turn-title {
+    background-color: var(--ast-turn-title);
+    width: 75px;
+}
