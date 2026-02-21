@@ -1,1 +1,1 @@
-web: gunicorn --k eventlet -w 1 --chdir backend server:app
+web: gunicorn -keep-alive eventlet -w 1 --chdir backend server:app
