@@ -1,9 +1,11 @@
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, join_room, leave_room
 from errors import  InvalidData
+import eventlet
+eventlet.monkey_patch()
 
 app = Flask(__name__)
-socket = SocketIO(app)
+socket = SocketIO(app, async_mode='eventlet')
 
 def getValue(payload:dict, key:str):
     if not (payload and (key in payload)):
