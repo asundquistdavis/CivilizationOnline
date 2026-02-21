@@ -3,7 +3,6 @@ import { MapArea, MapFeaturesList } from "../game/mapFeatures";
 import { PageState, PageStateData } from "../game/state";
 import { ACardsWindow } from "../gui/aCards";
 import { ASTWindow } from "../gui/ast";
-import { Census } from "../gui/census";
 import { HoveredFeatureWindow } from "../gui/gui";
 import { PhaseComponent } from "../gui/phase";
 import { PlayersComponent } from "../gui/players";
@@ -39,6 +38,7 @@ export class PlayingState extends PageState {
             userId: this.game.userId+'pepper',
             name: 'other player'
         }}});
+        // setInterval(()=>{this.game.requestGameData({type:'state',auth:'wild',data:{phaseName:Math.round(Math.random())?'census':'pregame'}})},1000)
         this.game.requestStaticAsset('civilizations');
         this.game.requestStaticAsset('aCards');
         this.hoveredWindow = this.game.gui.registerComponent(HoveredFeatureWindow, {parentId: 'gui', id: 'hovered-feature'});

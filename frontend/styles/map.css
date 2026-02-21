@@ -2,8 +2,10 @@
 :root {
     /* --land: #808080; */
     --land:#ecd8c0;
+    --land-adjacent:rgb(181, 226, 139);
     --water: #c6ddec;
     --coastal: azure;
+    --water-adjacent:#b2bcf5;
     --border: black;
     /* --hovered: #999999; */
     --hovered:#f5e4cf;
@@ -13,7 +15,7 @@
     --selected-border:white;
     --city: black;
     --floodplain: darkgreen;
-    --floodplain-border: green;
+    --floodplain-border: rgb(127, 138, 79);
     --floodplaincity: white;
     --water-stroke: rgb(85, 178, 255);
     --highlight: hsl(0, 0%, 84%);

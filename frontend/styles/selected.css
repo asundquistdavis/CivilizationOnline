@@ -9,3 +9,30 @@ div#selected-window-wrapper {
     min-width: 200px;
 
 }
+
+
+div.window-wrapper div.window-title-badges-wrapper #support[support="0"] {
+
+    background-color: var(--support0);
+
+}
+div.window-wrapper div.window-title-badges-wrapper #support[support="1"] {
+
+    background-color: var(--support1);
+
+}
+div.window-wrapper div.window-title-badges-wrapper #support[support="2"] {
+
+    background-color: var(--support2);
+
+}
+div.window-wrapper div.window-title-badges-wrapper #support[support="3"] {
+
+    background-color: var(--support3);
+
+}
+div.window-wrapper div.window-title-badges-wrapper #support[support="4"] {
+
+    background-color: var(--support4);
+
+}

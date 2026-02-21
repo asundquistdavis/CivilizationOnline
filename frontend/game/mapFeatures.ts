@@ -23,7 +23,7 @@ export class MapFeature {
     applyListeners( listeners:{action:keyof SVGElementEventMap, callback:(feature:MapFeature)=>void}[]) {
         
         listeners.forEach(({action, callback})=>{
-            this._element.addEventListener(action, (event)=>{console.log(event); callback(this)})
+            this._element.addEventListener(action, (event)=>{callback(this)})
         })
 
     }
@@ -220,7 +220,22 @@ export class MapArea extends MapFeature {
 
     copyElement(useCover=true):SVGElement {
         
-        const copyElement = ((useCover&&this._coverElement)? this.coverElement.cloneNode(): this._element.cloneNode()) as SVGElement;
+        // if (!useCover) {
+        //     const defs = document.createElement('defs');
+        //     const clipPath = document.createElement('clipPath');
+        //     const copyElement = this.element.cloneNode() as SVGAElement;
+        //     const copyCoverElement = this.coverElement.cloneNode() as SVGAElement;
+        //     clipPath.id = this.name.split(' ').join('-') + '-clip-path';
+        //     copyElement.removeAttribute('active');
+        //     copyElement.setAttribute('clip-path', `url(#${clipPath.id})`);
+        //     copyCoverElement.removeAttribute('active');
+        //     defs.appendChild(clipPath);
+        //     clipPath.appendChild(copyCoverElement);
+        //     copyElement.style.setProperty('fill', 'black');
+        //     copyElement.appendChild(defs);
+        //     return copyElement
+        // }
+        const copyElement = (useCover&&this._coverElement? this.coverElement.cloneNode(): this._element.cloneNode()) as SVGElement;
         copyElement.removeAttribute('active');
         return copyElement
 

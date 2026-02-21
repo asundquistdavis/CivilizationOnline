@@ -41,14 +41,25 @@ type Single = {
     state:GameState;
 }
 
-export type PhaseName = 'pregame'|'census'
+export type PhaseName = 'pregame'|'census';
+
+export type PregameSubPhaseName = '';
+
+export type CensusSubPhaseName = 'revolting';
+
+export class SubPhaseMapping {
+    pregame: PregameSubPhaseName;
+    census: CensusSubPhaseName;
+}
 
 export class GameState {
+    gameId:string='';
     phaseName:PhaseName='pregame';
+    subPhaseName: SubPhaseMapping[typeof this.phaseName]='';
     turnNumber:number = 0;
-
 }
 export class GameSetting {
+    gameId:string;
     id:string
     numberOfPlayers:number
 }
@@ -68,6 +79,7 @@ type RequestGameDataPayload<L extends keyof LocationToDataMap> = {
     auth:string,
     type:L,
     data:Partial<ToPartial<LocationToDataMap[L]>>,
+
 }
 
 type ConfirmGameDataPayload<L extends keyof LocationToDataMap> = {
@@ -77,6 +89,7 @@ type ConfirmGameDataPayload<L extends keyof LocationToDataMap> = {
     type:L,
     data:Partial<ToPartial<LocationToDataMap[L]>>,
     gameLess?:boolean
+
 }
 
 export type StaticArea = {
@@ -271,7 +284,7 @@ export default class Game {
                         const keyTyped = key as keyof Plural;
                         console.log(this._id);
                         const id = await this._db.putPluralInstance(keyTyped, data[keyTyped], this._id);
-                        (payload.data as Plural)[keyTyped] = await this._db.getPluralInstance(keyTyped, id) as any;
+                        // (payload.data as Plural)[keyTyped] = await this._db.getPluralInstance(keyTyped, id) as any;
                     }
                     break;
                 }
@@ -280,7 +293,7 @@ export default class Game {
                     for (const key in data) {
                         const keyTyped = key as keyof Plurals;
                         this._db.putPluralsAll(keyTyped, data[keyTyped], this._id);
-                        (payload.data as Plurals)[keyTyped] = await this._db.getPluralsAll(keyTyped, this._id) as any;
+                        // (payload.data as Plurals)[keyTyped] = await this._db.getPluralsAll(keyTyped, this._id) as any;
                     }
                     break;
                 }
@@ -288,7 +301,7 @@ export default class Game {
                 case 'state': {
                     const data = payload.data as Partial<GameState|GameSetting>;
                     this._db.putSingle(type, data, this._id);
-                    payload.data = await this._db.getSingle(type, this._id) as any;
+                    // payload.data = await this._db.getSingle(type, this._id) as any;
                 }
                 break;
             }
@@ -296,7 +309,6 @@ export default class Game {
         });
         
         this._conn.on('confirmGameData', <L extends keyof LocationToDataMap >(payload:ConfirmGameDataPayload<L>)=>{
-            console.log(payload);
             switch (payload.type) {
                 case 'pluralPutInstance': {
                     const data = payload.data as Partial<Plural>
@@ -340,8 +352,9 @@ export default class Game {
                     break;
                 }
                 case 'state': {
-                    const data = payload.data as Partial<GameState> 
+                    const data = payload.data as Partial<GameState>
                     for (const key in data) {
+                        console.log(key); 
                         const keyTyped = key as keyof Partial<GameState>;
                         this._gameState[keyTyped] = data[keyTyped] as never;
                         this.getListener(key).fire();
@@ -354,7 +367,7 @@ export default class Game {
 
         this._conn.on('joinGame', ({userId})=>{
             console.log(userId);
-            let player= this._plurals.players.find(player=>player.userId===userId);
+            let player = this._plurals.players.find(player=>player.userId===userId);
             if (player) {this._db.putPluralInstance('players', {isActive:true, id: player.id}, this._id)};
         });
 

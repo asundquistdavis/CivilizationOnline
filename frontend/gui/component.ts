@@ -88,13 +88,14 @@ export abstract class Component<P extends ComponentProps = ComponentProps> {
         windowElement.className += ' gui-standard';
         const windowTitleElement = window.titleElement = this.createTemplateElement('div', id, 'window-title', null, titleText);
         windowTitleElement.className += ' gui-bold';
-        const titleBadgesWrapper = this.createTemplateElement('div', id, 'window-title-badges-wrapper');
+        window.titleBadgesWrapper = this.createTemplateElement('div', id, 'window-title-badges-wrapper');
+        window.wrapperElement.appendChild(window.titleBadgesWrapper);
         const createTitleBadgeElement = (titleBadge:TitleBadge) => {
             if (titleBadge.symbol==='text-input') {
                 const badgeElement = this.createElement('input', id+'-'+titleBadge.id+'-window-title-badge', 'window-title-badge text-input gui-standard',
                      {type:'text', placeholder:titleBadge.text, value:''});
-                titleBadgesWrapper.addEventListener('input', titleBadge.onClick);
-                titleBadgesWrapper.appendChild(badgeElement);
+                window.titleBadgesWrapper.addEventListener('input', titleBadge.onClick);
+                window.titleBadgesWrapper.appendChild(badgeElement);
                 return
             }
             const badgeElement = this.createTemplateElement('button', id+'-'+titleBadge.id, 'window-title-badge', null, titleBadge.symbol||titleBadge.text);
@@ -109,7 +110,7 @@ export abstract class Component<P extends ComponentProps = ComponentProps> {
                 if (titleBadge.onClick) {badgeElement.addEventListener('click', titleBadge.onClick)};
             }
             badgeElement.className += ' gui-standard';
-            titleBadgesWrapper.appendChild(badgeElement);
+            window.titleBadgesWrapper.appendChild(badgeElement);
         }
         titleBadges.forEach(createTitleBadgeElement);
         const windowHeaderElement= this.createTemplateElement('div', id, '-window-header');
@@ -127,7 +128,6 @@ export abstract class Component<P extends ComponentProps = ComponentProps> {
         const windowBodyElement = window.bodyElement = this.createTemplateElement('div', id, 'window-body');
         const windowFooterElement = window.footerElement = this.createTemplateElement('div', id, 'window-footer');
         if (titleText) {windowWrapper.appendChild(windowTitleElement)};
-        if (titleBadges.length>0) {windowWrapper.appendChild(titleBadgesWrapper)};
         if (headerTabs.length>0) {
             windowElement.appendChild(windowHeaderElement)
         };
@@ -188,6 +188,20 @@ export class WindowTemplate {
 
     }
     clearBody():void {this.bodyElement.replaceChildren();}
+    addButton(id:string, text:string, attrs?:{[prop:string]:string}, onClick?:()=>void, onEnter?:()=>void, onLeave?:()=>void):void {
+        const badgeElement = document.createElement('div');
+        // const badgeElement = this.createTemplateElement('button', id+'-'+titleBadge.id, 'window-title-badge', null, titleBadge.symbol||titleBadge.text);
+        badgeElement.id = id;
+        badgeElement.className = 'window-title-badge';
+        badgeElement.innerText = text;
+        if (attrs) {Object.entries(attrs).forEach(([prop, value])=>badgeElement.setAttribute(prop, value))};
+        if (onClick) {badgeElement.addEventListener('click', onClick)};
+        if (onEnter) {badgeElement.addEventListener('mouseenter', onEnter)};
+        if (onLeave) {badgeElement.addEventListener('mouseleave', onLeave)};
+        this.titleBadgesWrapper.appendChild(badgeElement)
+    }
+    clearButtons() {this.titleBadgesWrapper.replaceChildren()}
+    titleBadgesWrapper:HTMLElement;
     footerElement:HTMLElement;
     bodyElement:HTMLElement;
     headerElement:HTMLElement;
