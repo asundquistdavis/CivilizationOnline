@@ -5,7 +5,7 @@ from errors import  InvalidData
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'abc-arrow')
-socket = SocketIO(app, async_mode='gevent', cors_allowed_origins="*")
+socket = SocketIO(app, async_mode='gevent', cors_allowed_origins="*", logger=True)
 
 def getValue(payload:dict, key:str):
     if not (payload and (key in payload)):
