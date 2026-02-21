@@ -1,10 +1,13 @@
 import eventlet
 eventlet.monkey_patch()
+
+import os
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, join_room, leave_room
 from errors import  InvalidData
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'abc-arrow')
 socket = SocketIO(app, async_mode='eventlet', cors_allowed_origins="*")
 
 def getValue(payload:dict, key:str):
