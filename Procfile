@@ -1,1 +1,1 @@
-web: gunicorn --chdir backend server:app 
+web: gunicorn --chdir backend wsgi:application --worker-class eventlet -w 1
