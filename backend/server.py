@@ -20,7 +20,7 @@ def index():
 def connect(payload:dict):
     if ((not payload) or  (not ('userId') in payload)):
         return InvalidData
-    userId = payload.get('userId') if payload.get('userId') else request.sid
+    userId = payload.get('userId') if payload.get('userId') else 1
     print('connected: ', userId)
     join_room(userId)    
     socket.emit('auth', userId)
