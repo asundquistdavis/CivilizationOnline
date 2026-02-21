@@ -1,1 +1,1 @@
-web: gunicorn --chdir backend server:app -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1 
+web: gunicorn --chdir backend server:app -k gevent -w 1 
