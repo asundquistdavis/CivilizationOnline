@@ -59,7 +59,6 @@ export class PlayingState extends PageState {
                 this.game.board.map.clearLayer('search-features');
                 if (!featureName) {return}
                 const targetFeatures = this.game.board.map.getMapFeaturesOfType('allFeature').filter(feature=>(new RegExp(featureName)).test(feature.name));
-                console.log(targetFeatures);
                 this.game.board.map.addLayer(targetFeatures, 'search-features');
             }}
         ]});

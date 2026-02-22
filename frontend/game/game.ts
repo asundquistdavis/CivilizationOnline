@@ -269,10 +269,9 @@ export default class Game {
 
         hostIdListener.addStateAction('initial', () => {this.checkState.bind(this)(); return true});
 
-        this.getListener('turnNumber').addStateAction('initial', () => {this.checkState.bind(this)(); console.log(this._gameState.turnNumber); return true});
+        this.getListener('turnNumber').addStateAction('initial', () => {this.checkState.bind(this)(); return true});
 
         this._conn.on('requestGameData', async <L extends keyof LocationToDataMap >(payload:RequestGameDataPayload<L>)=>{
-            console.log(payload);
             const userId = payload.userId
             const auth = payload.auth
             if (!this.validate(userId, auth)) {return}
@@ -282,7 +281,6 @@ export default class Game {
                     const data = payload.data as Partial<Plural>;
                     for (const key in data) {
                         const keyTyped = key as keyof Plural;
-                        console.log(this._id);
                         const id = await this._db.putPluralInstance(keyTyped, data[keyTyped], this._id);
                         // (payload.data as Plural)[keyTyped] = await this._db.getPluralInstance(keyTyped, id) as any;
                     }
@@ -354,7 +352,6 @@ export default class Game {
                 case 'state': {
                     const data = payload.data as Partial<GameState>
                     for (const key in data) {
-                        console.log(key); 
                         const keyTyped = key as keyof Partial<GameState>;
                         this._gameState[keyTyped] = data[keyTyped] as never;
                         this.getListener(key).fire();
@@ -366,7 +363,6 @@ export default class Game {
         });
 
         this._conn.on('joinGame', ({userId})=>{
-            console.log(userId);
             let player = this._plurals.players.find(player=>player.userId===userId);
             if (player) {this._db.putPluralInstance('players', {isActive:true, id: player.id}, this._id)};
         });
@@ -421,8 +417,6 @@ export default class Game {
 
         const text = await this._conn.getMapText(mapId);
 
-        console.log(text);
-
         this._board.loadMap(text, mapId);
 
     }
@@ -437,7 +431,6 @@ export default class Game {
             gameId = await this._db.hostNewGame();
             // create player instance (for the host) in db
             const userId = this.userId;
-            console.log(gameId);
             await this._db.putPluralInstance('players', {name, userId}, gameId);
             const players = await this._db.getAllEntitiesWithOSIndexValue('players', 'gameId', gameId) as Player[];
             // set the local id to gameId
@@ -650,7 +643,6 @@ class PregameState extends PageState {
     onSet(): void {
     }
     onReset(): void {
-        console.log('resetting pregame');
     }
     condition(this:Game) {return false}
     name='pregame';

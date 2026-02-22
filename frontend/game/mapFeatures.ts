@@ -159,7 +159,6 @@ export class MapFeaturesList<K extends keyof MapFeatureMapping, T extends MapFea
             const adjacentLandAreas = feature.adjacentLandAreaNames.map(name=> {
                 return areas.find(landFeature=>landFeature.name===name)
             });
-            // console.log(feature.adjacentCoastalAreaNames);
             const adjacentCoastalAreas = feature.adjacentCoastalAreaNames.map(name=> {
                 return areas.find(coastalFeature=>coastalFeature.name===name)
             });

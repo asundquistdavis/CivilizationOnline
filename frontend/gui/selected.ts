@@ -11,12 +11,10 @@ interface SelectedComponentProps extends ComponentProps {
 export class SelectedComponent extends Component<SelectedComponentProps> {
     protected _dependencyList: { listenerId: string; action: () => void; id?: string; }[] = [
         {listenerId:'select', action:()=>{
-            console.log(this.game.state.getStateData('selectedPlayer'), this.game.board.map.selectedFeature);
             this.selectedEntity=this.game.board.map.selectedFeature?this.game.board.map.selectedFeature:this.game.state.getStateData('selectedPlayer');
             this.update();
         }},
         {listenerId:'selectedPlayer', action:()=>{
-            console.log(this.game.state.getStateData('selectedPlayer'), this.game.board.map.selectedFeature);
             this.selectedEntity = this.game.state.getStateData('selectedPlayer')?this.game.state.getStateData('selectedPlayer'):this.game.board.map.selectedFeature;
             this.update();
         }}

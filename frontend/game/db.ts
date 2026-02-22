@@ -164,8 +164,6 @@ export default class DB {
 
     putSingle(key:'setting'|'state', value:Partial<GameState>|Partial<GameSetting>, gameId:string) {
 
-        console.log(key, value, gameId);
-
         return new Promise((resolve, reject)=>{
 
             const request = this._db.transaction(key, 'readwrite').objectStore(key).put({...value, gameId});
