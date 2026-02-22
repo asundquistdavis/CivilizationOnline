@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_from_directory, current_app
 from flask_socketio import SocketIO, join_room, leave_room
 from errors import  InvalidData
 
@@ -29,7 +29,7 @@ def connect(payload:dict):
 def requestMap(data):
     if ((not data) or (not ('targetMapId' in data))):
         raise InvalidData
-    with open('./backend/assets/maps/standard.html', 'rb') as mapBin:
+    with open('./backend/static/assets/maps/standard.html', 'rb') as mapBin:
         socket.emit('sendMap', {'map': mapBin.read()})
 
 @socket.on('requestStaticAsset')
