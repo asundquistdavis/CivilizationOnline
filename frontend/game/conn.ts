@@ -1,4 +1,5 @@
 import {io, Socket} from 'socket.io-client';
+import { StaticAssets } from './game';
 
 type ServerData = any
 type ServerPayload = string;
@@ -20,6 +21,18 @@ export default class Conn {
     emit(event:string, data:ClientData) {
 
         this._socket.emit(event, data);
+
+    }
+
+    async getStaticAsset(type:keyof StaticAssets|'map', name?:string):Promise<any> {
+
+        return fetch(`/static/assets/${type}/${name}`).then(value=>value.json())
+
+    }
+
+    async getMapText(name:string='standard.html') {
+
+        return fetch(`/static/assets/maps/${name}`).then(value=>value.text())
 
     }
 

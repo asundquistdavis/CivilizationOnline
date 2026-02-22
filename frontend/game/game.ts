@@ -120,7 +120,7 @@ export type StaticACard = {
 
 export type StaticTCard = {}
 
-class StaticAssets {
+export class StaticAssets {
 
     areas: StaticArea[]=[];
     civilizations:StaticCivilization[]=[];
@@ -373,14 +373,6 @@ export default class Game {
 
         this._conn.on('activeGames', ()=>this.sendActiveGame(true));
 
-        this._conn.on('requestStaticAsset', (payload:{type:keyof StaticAssets, data:string})=>{
-
-            const value = JSON.parse(payload.data)
-            this._staticAssets[payload.type] = value;
-            this.getListener(`static-${payload.type}`).fire();
-
-        })
-
     }
 
     requestGameData<L extends keyof LocationToDataMap>(payload:RequestGameDataPayload<L>):void {
@@ -425,9 +417,13 @@ export default class Game {
 
     }
 
-    loadMap(mapId?:string):void {
+    async loadMap(mapId?:string):Promise<void> {
 
-        this._board.loadMap(this._conn, mapId);
+        const text = await this._conn.getMapText(mapId);
+
+        console.log(text);
+
+        this._board.loadMap(text, mapId);
 
     }
 
@@ -460,9 +456,9 @@ export default class Game {
         
     }
 
-    requestStaticAsset(type:keyof StaticAssets, name='standard.json') {
+    async requestStaticAsset(type:keyof StaticAssets, name='standard.json') {
 
-        this._conn.emit('requestStaticAsset', {type, name});
+        this._staticAssets[type] = await this._conn.getStaticAsset(type, name) as any;
 
     }
     

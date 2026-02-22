@@ -5,7 +5,7 @@ from errors import  InvalidData
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'abc-arrow')
-socket = SocketIO(app, async_mode='gevent', cors_allowed_origins="*", logger=True)
+socket = SocketIO(app, async_mode='gevent', cors_allowed_origins="*")
 
 def getValue(payload:dict, key:str):
     if not (payload and (key in payload)):
@@ -24,20 +24,6 @@ def connect(payload:dict):
     print('connected: ', userId)
     join_room(userId)    
     socket.emit('auth', userId)
-
-@socket.on('requestMap')
-def requestMap(data):
-    if ((not data) or (not ('targetMapId' in data))):
-        raise InvalidData
-    with open('./backend/static/assets/maps/standard.html', 'rb') as mapBin:
-        socket.emit('sendMap', {'map': mapBin.read()})
-
-@socket.on('requestStaticAsset')
-def requestStatic(payload:dict):
-    type = getValue(payload, 'type')
-    name = getValue(payload, 'name')
-    with open(f'./backend/assets/{type}/{name}', 'r') as file:
-        socket.emit('requestStaticAsset', {**payload, 'data': file.read()})
 
 @socket.on('joinGame')
 def joinGame(payload:dict):
@@ -74,6 +60,6 @@ def disconnecting(data:dict):
     pass
 
 if (__name__ == '__main__'):
-    socket.run(app, use_reloader=True)
+    socket.run(app, use_reloader=True, debug=True)
 
 

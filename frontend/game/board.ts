@@ -335,45 +335,30 @@ export default class Board {
     }
 
 
-    loadMap(conn:Conn, targetMapId:string='standard.html'):Promise<void> {
+    loadMap(text:string, targetMapId:string='standard.html'):void{
         // lock the map from being used
         this._mapIsReady = false;
-
-        // request map from server
-        conn.emit('requestMap', {targetMapId});
-
-        return new Promise<void>((resolve, reject)=>{
-
-            // when map data is received... 
-            conn.on('sendMap', (data) => {
-                // convert binary data into string
-                const decoder = new TextDecoder('utf-8');
-                const unit8Array = new Uint8Array(data.map as ArrayBuffer);
-                const mapString = decoder.decode(unit8Array);
                 
-                // insert map string into the map container
-                this._mapContainerElement.innerHTML = mapString;
-                
-                // create new map object
-                this._map = new Map(this._listeners);
-                
-                // abort if map is invalid
-                if (this._map.isInvalid) {reject(null)}
+        // insert map string into the map container
+        this._mapContainerElement.innerHTML = text;
+        
+        // create new map object
+        this._map = new Map(this._listeners);
+        
+        // abort if map is invalid
+        if (this._map.isInvalid) {}
 
-                // unlock map
-                this._mapIsReady = true
-                
-                // resize map (and board)
-                this.resize();
+        // unlock map
+        this._mapIsReady = true
+        
+        // resize map (and board)
+        this.resize();
 
-                // this.map.getMapFeaturesOfType('area').setOnMouseDown(feature=>this.map.selectFeature(feature));
-                // this.map.getMapFeaturesOfType('area').activate();
-                
-                this.applyMapReadyActions();
+        // this.map.getMapFeaturesOfType('area').setOnMouseDown(feature=>this.map.selectFeature(feature));
+        // this.map.getMapFeaturesOfType('area').activate();
+        
+        this.applyMapReadyActions();
 
-                resolve(null)
-            })
-        })
 
     }
 
