@@ -15,7 +15,7 @@ export abstract class PageState {
     abstract name:string;
     abstract onSet():void;
     abstract onReset():void;
-    abstract condition():boolean;
+    abstract condition():boolean; 
 
 }
 

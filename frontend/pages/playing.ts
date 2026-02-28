@@ -32,7 +32,6 @@ export class PlayingState extends PageState {
     aCards:ACardsWindow;
     hoveredWindow:HoveredFeatureWindow;
     async onSet(): Promise<void> {
-        this.game.openActiveGame(this.game.userId, 'andrew');
         this.game.requestGameData({type:'pluralPutInstance', auth:'wild', data:{players:{
             isActive: true,
             userId: this.game.userId+'pepper',
@@ -71,7 +70,7 @@ export class PlayingState extends PageState {
         this.aCards.dismount();
     }
     condition(): boolean {
-        return true
+        return this.game.getSingle('state')?.turnNumber>0;
     }
     constructor(game:Game) {
         super(game);

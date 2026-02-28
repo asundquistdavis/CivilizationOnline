@@ -15,7 +15,6 @@ export class PlayersComponent extends Component {
     window:WindowTemplate;
     renderPlayers() {
         this.window.clearBody();
-        console.log(this.game.getPluralsAll('players'));
         this.game.getPluralsAll('players').forEach(player=>this.renderPlayer(player))};
     renderPlayer(player:Player) {
         const playerRowElement = this.createTemplateElement('div', this.id+'-'+player.id, 'player-row');

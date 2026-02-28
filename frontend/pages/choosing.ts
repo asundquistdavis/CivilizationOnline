@@ -25,61 +25,39 @@ export class ChoosingState extends PageState {
         this.game.seesActiveGames = false;
         this.game.gui.unregisterComponent('choosing');
     }
-    condition(this:Game) {return false}
+    condition() {return !this.game.hostId}
     name='choosing';
 }
 
 class ChoosingComponentProps implements ComponentProps {
     parentId: string;
     id: string;
-    selected:()=>void
-
 }
 
-class ChoosingComponent extends Component {
-    protected _dependencyList: { listenerId: string; action: () => void; id?: string; }[] = [
-        {listenerId:'select', action:()=>this.renderSelectedText()},
-
-    ];
-    window:WindowTemplate;
-    renderSelectedText() {
-        this.window.footerElement.innerText = this.game.board.map?.selectedFeature?.name||'';
+class ChoosingComponent extends Component<ChoosingComponentProps> {
+    updateActiveGames=()=>{
+        this.activeGamesListElement.replaceChildren();
+        this.game.getPluralsAll('activeGames').forEach(game=>{
+            const gameElement = this.createTemplateElement('div', game.hostId, 'active-game-element', undefined, game.hostId);
+            this.activeGamesListElement.appendChild(gameElement);
+        });
     }
-
+    protected _dependencyList: { listenerId: string; action: () => void; id?: string; }[] = [
+        {listenerId:'activeGames', action: this.updateActiveGames}
+    ];
+    activeGamesListElement = this.createTemplateElement('div', this.id, 'active-games');
+    window:WindowTemplate;
     render(): void {
         this.window = this.createWindow(this.parentElement, this.id, 'Choose Game', [], [], true);
-        const applyButton = this.createTemplateElement('button', this.id, 'apply-button', undefined, 'apply');
-        const saveButton = this.createTemplateElement('button', this.id, 'save-button', undefined, 'save');
-        applyButton.addEventListener('click', ()=>{
-            const forceClosedPath = (element:SVGElement) => {
-                const d = element.getAttribute('d');
-                const newD = ((d.charAt(-1)==='z')||(d.charAt(-1)==='Z'))? d: d + 'z';
-                element.setAttribute('d', newD);
-            }
-            this.game.board.map.getMapFeaturesOfType('allFeature').forEach((feature:MapArea)=>{
-                forceClosedPath(feature.element);
-                if (feature.coverElement) {forceClosedPath(feature.coverElement)};
-            })
+        this.window.show();
+        this.window.wrapperElement.className += ' centered-top';
+        this.window.bodyElement.appendChild(this.activeGamesListElement);
+        const createNewGameButton = this.createElement('button', 'create-new-game-button', 'gui-standard button', undefined, 'Host');
+        createNewGameButton.addEventListener('click', ()=>{
+            this.game.openActiveGame(this.game.userId);
         })
-        saveButton.addEventListener('click', ()=>{            
-            this.game.board.map.getMapFeaturesOfType('area').deactivate();
-            this.game.board.map.getMapFeaturesOfType('openSea').deactivate();
-            this.game.board.map.getMapFeaturesOfType('city').deactivate();
-            this.game.board.map.getMapFeaturesOfType('floodplain').deactivate();
-            this.game.board.map.getMapFeaturesOfType('volcano').deactivate();
-            const svg = document.getElementById('mapSVG').outerHTML;
-            const blob = new Blob([svg], {type:'text/html'});
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'mapSVG.html';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(a.href);
-        })
-        this.window.bodyElement.appendChild(applyButton);
-        this.window.bodyElement.appendChild(saveButton);
-        this.renderSelectedText();
+        this.window.bodyElement.appendChild(createNewGameButton);
+
     }
 }
 

@@ -2,9 +2,8 @@
 div#choosing {
 
     position: absolute;
-    left:2dvh;
-    bottom:2dvh;
-
+    --max-width: 430px;
+    --max-height: 465px;
 }
 
 
@@ -14,11 +13,5 @@ div.active-game {
     flex-direction: row;
     align-items: center;
     justify-content: start;
-
-}
-
-div.active-game div:not(:first-child),button:not(:first-child) {
-
-    margin-left: 5px;
 
 }

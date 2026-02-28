@@ -113,7 +113,7 @@ export abstract class Component<P extends ComponentProps = ComponentProps> {
             window.titleBadgesWrapper.appendChild(badgeElement);
         }
         titleBadges.forEach(createTitleBadgeElement);
-        const windowHeaderElement= this.createTemplateElement('div', id, '-window-header');
+        const windowHeaderElement= this.createTemplateElement('div', id, 'window-header');
         const createHeaderTabElementAndGetPack = (headerTab:HeaderTab) => {
             const tabElement = this.createTemplateElement('button', id+'-'+headerTab.id, 'window-header-tab', null, headerTab.text);
             tabElement.className += ' gui-standard';
@@ -129,7 +129,8 @@ export abstract class Component<P extends ComponentProps = ComponentProps> {
         const windowFooterElement = window.footerElement = this.createTemplateElement('div', id, 'window-footer');
         if (titleText) {windowWrapper.appendChild(windowTitleElement)};
         if (headerTabs.length>0) {
-            windowElement.appendChild(windowHeaderElement)
+            windowElement.appendChild(windowHeaderElement);
+            window._activeTabId = window.tabElementRenderAndIdList[0].id;
         };
         windowElement.appendChild(windowBodyElement);
         if (hasFooter) {windowElement.appendChild(windowFooterElement)};
@@ -163,7 +164,9 @@ export class WindowTemplate {
     private _onShow:(window:WindowTemplate) => void = ()=>{};
     set onShow(value:(window:WindowTemplate)=>void) {this._onShow = value};
     tabElementRenderAndIdList:{id:string, renderBody:((parentElement:HTMLElement)=>void), element:HTMLElement}[] = [];
+    _activeTabId:string=null;
     set activeTabId(value:string) {
+        this._activeTabId = value;
         this.clearBody();
         this.tabElementRenderAndIdList.forEach(({element})=>{element.removeAttribute('active')});
         if (!value) {return}
@@ -178,6 +181,7 @@ export class WindowTemplate {
     show = () => {
         this._parentElement.appendChild(this.wrapperElement);
         this.clearBody();
+        if (this.tabElementRenderAndIdList.length) {this.activeTabId=this._activeTabId};
         this._onShow(this)
         this._hidden = false;
     }
@@ -188,9 +192,8 @@ export class WindowTemplate {
 
     }
     clearBody():void {this.bodyElement.replaceChildren();}
-    addButton(id:string, text:string, attrs?:{[prop:string]:string}, onClick?:()=>void, onEnter?:()=>void, onLeave?:()=>void):void {
-        const badgeElement = document.createElement('div');
-        // const badgeElement = this.createTemplateElement('button', id+'-'+titleBadge.id, 'window-title-badge', null, titleBadge.symbol||titleBadge.text);
+    addButton(id:string, text:string, attrs?:{[prop:string]:string}, onClick?:()=>void, onEnter?:()=>void, onLeave?:()=>void):HTMLElement {
+        const badgeElement = document.createElement('button');
         badgeElement.id = id;
         badgeElement.className = 'window-title-badge';
         badgeElement.innerText = text;
@@ -198,7 +201,8 @@ export class WindowTemplate {
         if (onClick) {badgeElement.addEventListener('click', onClick)};
         if (onEnter) {badgeElement.addEventListener('mouseenter', onEnter)};
         if (onLeave) {badgeElement.addEventListener('mouseleave', onLeave)};
-        this.titleBadgesWrapper.appendChild(badgeElement)
+        this.titleBadgesWrapper.appendChild(badgeElement);
+        return badgeElement;
     }
     clearButtons() {this.titleBadgesWrapper.replaceChildren()}
     titleBadgesWrapper:HTMLElement;

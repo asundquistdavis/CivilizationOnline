@@ -1,11 +1,13 @@
-import GUI, { HoveredFeatureWindow } from "../gui/gui";
+import GUI from "../gui/gui";
 import Conn from "./conn"
 import DB from "./db"
 import { ChoosingState } from "../pages/choosing";
 import { PageState } from "./state";
 import Board from "./board";
-import { MapArea, MapFeature, MapFeatureMapping, MapOpenSea } from "./mapFeatures";
+import { MapArea, MapFeatureMapping, MapOpenSea } from "./mapFeatures";
 import { PlayingState } from "../pages/playing";
+import { LoadingState } from "../pages/loading";
+import { PregameState } from "../pages/pregame";
 
 export class Plurals {
 
@@ -18,11 +20,14 @@ export class Plural {
     activeGames:ActiveGame;
 }
 
-export type Player = {
-    isActive:boolean,
-    userId:string,
+export class Player {
+    isActive:boolean=false;
+    userId:string;
     id:string;
-    name:string;
+    name:string='';
+    static extendDefault(overwrite:Partial<Player>):Player {
+        return {...new Player, ...overwrite}
+    }
 };
 
 type Civilization = {
@@ -54,15 +59,37 @@ export class SubPhaseMapping {
 
 export class GameState {
     gameId:string='';
+    id:string='';
     phaseName:PhaseName='pregame';
     subPhaseName: SubPhaseMapping[typeof this.phaseName]='';
     turnNumber:number = 0;
+    static extendDefault(overwrite:Partial<GameState>):GameState {
+        return {...new GameState, ...overwrite}
+    } 
 }
 export class GameSetting {
-    gameId:string;
-    id:string
-    numberOfPlayers:number
+    gameId:string='';
+    id:string='';
+    name:string='';
+    numberOfPlayers:number=18;
+    mapName:string='standard';
+    isShortGame:boolean=true;
+    static extendDefault(overwrite:Partial<GameSetting>):GameSetting {
+        return {...new GameSetting, ...overwrite}
+    }
 }
+
+type InputParams = ['none'|'number'|'check'|'text'|'option', ...Array<any>]
+
+export const GameSettingAsInput:Record<keyof GameSetting, InputParams> = {
+    gameId:['none'],
+    id:['none'],
+    name:['text'],
+    numberOfPlayers:['number', 0, 18],
+    mapName:['option', 'standard', 'other'],
+    isShortGame:['check'],
+}
+
 
 type LocationToDataMap = {
     setting:GameSetting;
@@ -212,7 +239,7 @@ export default class Game {
 
         for (const state of this._states) {
                         
-            if (state.condition.bind(this)()) {this.state = state; return}
+            if (state.condition()) {this.state = state; return}
 
         }
 
@@ -267,9 +294,11 @@ export default class Game {
 
         this._gameDataListeners.push(new GameDataListener('hover'));
 
-        hostIdListener.addStateAction('initial', () => {this.checkState.bind(this)(); return true});
+        hostIdListener.addStateAction('initial', () => {this.checkState(); return true});
 
-        this.getListener('turnNumber').addStateAction('initial', () => {this.checkState.bind(this)(); return true});
+        this.getListener('mapName').addStateAction('mapNameChange', ()=> this.loadMap(this.getSingle('setting').mapName + '.html') )
+
+        this.getListener('turnNumber').addStateAction('initial', () => {this.checkState(); return true});
 
         this._conn.on('requestGameData', async <L extends keyof LocationToDataMap >(payload:RequestGameDataPayload<L>)=>{
             const userId = payload.userId
@@ -367,7 +396,7 @@ export default class Game {
             if (player) {this._db.putPluralInstance('players', {isActive:true, id: player.id}, this._id)};
         });
 
-        this._conn.on('activeGames', ()=>this.sendActiveGame(true));
+        this._conn.on('activeGames', ()=>this.sendActiveGame());
 
     }
 
@@ -431,21 +460,42 @@ export default class Game {
             gameId = await this._db.hostNewGame();
             // create player instance (for the host) in db
             const userId = this.userId;
-            await this._db.putPluralInstance('players', {name, userId}, gameId);
-            const players = await this._db.getAllEntitiesWithOSIndexValue('players', 'gameId', gameId) as Player[];
+            // await this._db.putPluralInstance('players', {...new Player, userId}, gameId);
+            // await this._db.putSingle('state', new GameState, gameId);
+            // await this._db.putSingle('setting', new GameSetting, gameId);
+            // const players = await this._db.getAllEntitiesWithOSIndexValue('players', 'gameId', gameId) as Player[];
+            // const state = await this._db.getSingle('setting', gameId) as GameState;
+            // const setting = await this._db.getSingle('state', gameId) as GameSetting;
+            const setting = new GameSetting;
+            const state = new GameState;
+            const players = [Player.extendDefault({userId})]
             // set the local id to gameId
-            this._id = gameId;
-            this._plurals['players']=players;
-            this.getListener('players').fire();
-            
-        } else {
-            // join and/or open existing game
-
-        } 
-        // send active game to server
-        this._conn.emit('joinGame', {hostId, userId:this.userId});
-        this.sendActiveGame();
-        return
+            this._id = gameId;            
+            // send active game to server
+            this._conn.on('joinGame', ()=>{
+                const settingPayload:RequestGameDataPayload<'setting'> = {
+                    auth: 'wild',
+                    type:'setting',
+                    data: setting
+                }
+                this.requestGameData(settingPayload);
+                const statePayload:RequestGameDataPayload<'state'> = {
+                    auth: 'wild',
+                    type:'state',
+                    data: state
+                }
+                this.requestGameData(statePayload);
+                console.log(players);
+                const playersPayload:RequestGameDataPayload<'pluralPutAll'> = {
+                    auth: 'wild',
+                    type:'pluralPutAll',
+                    data: {players}
+                }
+                this.requestGameData(playersPayload);
+            }, true);
+            this._conn.emit('joinGame', {hostId, userId:this.userId});
+            this.sendActiveGame();
+        }
         
     }
 
@@ -455,26 +505,7 @@ export default class Game {
 
     }
     
-    async sendActiveGame(test?:boolean):Promise<void> {
-
-        if (test) {
-            const players:Player[] = [{
-                userId:this.userId,
-                id: '1',
-                name: 'andrew',
-                isActive: true,
-            }];
-            const setting = new GameSetting;
-            const state = new GameState;
-            const activeGames = {hostId:this.userId, players, setting, state, id:''};
-            const payload:ConfirmGameDataPayload<'pluralPutInstance'> = {
-                hostId: this.userId,
-                type: 'pluralPutInstance',
-                data: {activeGames},
-                gameLess:true
-            }
-            return this._conn.emit('confirmGameData', payload);
-        }
+    async sendActiveGame():Promise<void> {
 
         if (!this._id) {return}
         const players = await this._db.getPluralsAll('players', this._id) as Player[];
@@ -605,45 +636,4 @@ export class GameDataListener {
 
     get id():string {return this._id};
 
-}
-
-class LoadingState extends PageState {
-    protected _stateData: any;
-    getStateData(key: keyof any) {
-        throw new Error("Method not implemented.");
-    }
-    setStateData(key: keyof any, value: any[typeof key]): void {
-        throw new Error("Method not implemented.");
-    }
-    protected _stateDataListeners: Map<string | number | symbol, GameDataListener>;
-    getStateDataListener(key: keyof any): GameDataListener {
-        throw new Error("Method not implemented.");
-    }
-    onSet(): void {
-    }
-    onReset(): void {
-
-    }
-    condition(this:Game) {return true}
-    name='loading';
-}
-
-class PregameState extends PageState {
-    protected _stateData: any;
-    getStateData(key: keyof any) {
-        throw new Error("Method not implemented.");
-    }
-    setStateData(key: keyof any, value: any[typeof key]): void {
-        throw new Error("Method not implemented.");
-    }
-    protected _stateDataListeners: Map<string | number | symbol, GameDataListener>;
-    getStateDataListener(key: keyof any): GameDataListener {
-        throw new Error("Method not implemented.");
-    }
-    onSet(): void {
-    }
-    onReset(): void {
-    }
-    condition(this:Game) {return false}
-    name='pregame';
 }

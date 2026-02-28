@@ -52,14 +52,19 @@ div.window {
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
-    padding-top: calc( 3 * var(--window-padding));
     overflow-y: auto;
 
 }
 
-div.window-wrapper:has(div.window-title, div.window-title-badges-wrapper) div.window-header button.window-tab{
+div.window-wrapper:has(div.window-title, div.window-title-badges-wrapper) div.window div.window-header button.window-header-tab {
 
-    padding-top: calc( 2 * var(--window-padding) );
+    padding-top: calc( 4 * var(--window-padding));
+
+}
+
+div.window-wrapper:has(div.window-title, div.window-title-badges-wrapper) div.window:not(:has(div.window-header)) div.window-body {
+
+    margin-top: calc( 3 * var(--window-padding) );
 
 }
 
@@ -70,7 +75,7 @@ div.window-title {
     translate: 0 calc( 3 * var(--window-padding) - 100%);
     left: var(--window-padding);
     right: var(--window-padding);
-    padding: 1px;
+    padding: 2px;
     border-radius: 3px;
 
 
@@ -95,6 +100,7 @@ button.window-title-badge {
     background-color: var(--window-line-color-1);
     margin-left: var(--window-padding);
     pointer-events: all;
+    border-radius: 5px;
 
 }
 

@@ -114,11 +114,15 @@ export default class DB {
 
     }
 
-    putPluralInstance(dbEntity:keyof Plurals, value:Partial<Plural[typeof dbEntity]>, gameId:string):Promise<string> {
+    async putPluralInstance(dbEntity:keyof Plurals, value:Partial<Plural[typeof dbEntity]>, gameId:string):Promise<string> {
+
+        const initialValue = await this.getPluralInstance(dbEntity, gameId);
+
+        console.log(initialValue);
 
         return new Promise((resolve, reject)=>{
 
-            const request = this._db.transaction(dbEntity, 'readwrite').objectStore(dbEntity).put({...value, gameId});
+            const request = this._db.transaction(dbEntity, 'readwrite').objectStore(dbEntity).put({...initialValue, ...value, gameId});
 
             request.onsuccess = event => resolve((event.target as IDBRequest).result);
 
@@ -128,23 +132,9 @@ export default class DB {
 
     }
 
-    putPluralsAll(dbEntity:keyof Plurals, values:Plurals[typeof dbEntity], gameId:string) {
+    async putPluralsAll(dbEntity:keyof Plurals, values:Plurals[typeof dbEntity], gameId:string) {
 
-        return new Promise((resolve, reject)=>{
-
-            const objectStore = this._db.transaction(dbEntity, 'readwrite').objectStore(dbEntity);
-
-            values.forEach(value=>{
-
-                objectStore.put({...value, gameId});
-
-            });
-
-            objectStore.transaction.oncomplete = event => resolve((event.target as IDBRequest).result);
-
-            objectStore.transaction.onerror = event => reject((event.target as IDBRequest).error);
-
-        });
+        return Promise.all(values.map(value=>this.putPluralInstance(dbEntity, value, gameId)));
 
     }
 
@@ -162,11 +152,13 @@ export default class DB {
 
     }
 
-    putSingle(key:'setting'|'state', value:Partial<GameState>|Partial<GameSetting>, gameId:string) {
+    async putSingle(key:'setting'|'state', value:Partial<GameState>|Partial<GameSetting>, gameId:string) {
 
+        const initialValue = await this.getSingle(key, gameId);
+        
         return new Promise((resolve, reject)=>{
-
-            const request = this._db.transaction(key, 'readwrite').objectStore(key).put({...value, gameId});
+            
+            const request = this._db.transaction(key, 'readwrite').objectStore(key).put({...initialValue, ...value, gameId});
 
             request.onsuccess = event => resolve((event.target as IDBRequest).result);
 

@@ -1,6 +1,6 @@
 import os
 from flask import Flask, render_template, request, send_from_directory, current_app
-from flask_socketio import SocketIO, join_room, leave_room
+from flask_socketio import SocketIO, join_room, leave_room, emit
 from errors import  InvalidData
 
 app = Flask(__name__)
@@ -23,19 +23,20 @@ def connect(payload:dict):
     userId = payload.get('userId') if payload.get('userId') else request.sid
     print('connected: ', userId)
     join_room(userId)    
-    socket.emit('auth', userId)
+    emit('auth', userId)
 
 @socket.on('joinGame')
 def joinGame(payload:dict):
     hostId = getValue(payload, 'hostId')
     userId = getValue(payload, 'userId')
+    if (hostId==userId): join_room(hostId)
     join_room('game'+hostId)
-    socket.emit('joinGame', {'userId':userId}, room=hostId)
+    emit('joinGame', {'userId':userId}, room=hostId)
 
 @socket.on('activeGamesOn')
 def activeGamesOn(payload:dict):
     join_room('activeGames')
-    socket.emit('activeGames', broadcast=True)
+    emit('activeGames', broadcast=True)
 
 @socket.on('activeGamesOff')
 def activeGamesOff(payload:dict):
@@ -43,9 +44,8 @@ def activeGamesOff(payload:dict):
 
 @socket.on('requestGameData')
 def requestGameData(payload:dict):
-    print('request', )
     hostId = getValue(payload, 'hostId')
-    socket.emit('requestGameData', payload, room=hostId)
+    emit('requestGameData', payload, room=hostId)
 
 @socket.on('confirmGameData')
 def confirmGameData(payload:dict):
@@ -53,7 +53,7 @@ def confirmGameData(payload:dict):
     gamesLess = payload.get('gameLess', False)
     hostId = getValue(payload, 'hostId')
     room = 'activeGames' if gamesLess else ('game' + hostId)
-    socket.emit('confirmGameData', payload, room=room)
+    emit('confirmGameData', payload, room=room)
 
 @socket.on('disconnecting')
 def disconnecting(data:dict):
